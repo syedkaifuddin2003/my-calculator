@@ -26,7 +26,10 @@ def calculate(operation, num1, num2=None):
     """Simple calculator CLI"""
     try:
         # Validate arity for 2-arg operations
-        if operation in ("add", "subtract", "multiply", "divide", "power") and num2 is None:
+        if (
+            operation in ("add", "subtract", "multiply", "divide", "power")
+            and num2 is None
+        ):
             click.echo(f"Error: operation '{operation}' requires two numeric arguments")
             sys.exit(1)
 
