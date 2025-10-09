@@ -17,6 +17,7 @@ try:
 except ImportError:
     from calculator import add, subtract, multiply, divide, power, square_root
 
+
 @click.command()
 @click.argument("operation")
 @click.argument("num1", type=float)
@@ -27,7 +28,10 @@ def calculate(operation, num1, num2=None):
         operation = operation.lower()
 
         # Validate 2-arg operations
-        if operation in ("add", "subtract", "multiply", "divide", "power") and num2 is None:
+        if (
+            operation in ("add", "subtract", "multiply", "divide", "power")
+            and num2 is None
+        ):
             click.echo(f"Error: operation '{operation}' requires two numeric arguments")
             sys.exit(1)
 
@@ -58,6 +62,7 @@ def calculate(operation, num1, num2=None):
     except Exception as e:
         click.echo(f"Error: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     calculate()
