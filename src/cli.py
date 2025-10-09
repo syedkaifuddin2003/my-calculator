@@ -23,12 +23,6 @@ except ImportError:
 def calculate(operation, num1, num2=None):
     """Simple calculator CLI"""
     try:
-        # Validate 2-arg operations
-        if operation in ("add", "subtract", "multiply", "divide", "power") and num2 is None:
-            click.echo(f"Error: operation '{operation}' requires two numeric arguments")
-            sys.exit(1)
-
-        # Compute result
         if operation == "add":
             result = add(num1, num2)
         elif operation == "subtract":
@@ -39,23 +33,12 @@ def calculate(operation, num1, num2=None):
             result = divide(num1, num2)
         elif operation == "power":
             result = power(num1, num2)
-        elif operation == "sqrt":
+        elif operation == "square_root" or operation == "sqrt":
             result = square_root(num1)
         else:
             click.echo(f"Unknown operation: {operation}")
             sys.exit(1)
-
-        # Print result
-        click.echo(result)
-        sys.exit(0)
-
-    except ZeroDivisionError:
-        click.echo("Cannot divide by zero")
-        sys.exit(1)
+        return result
     except Exception as e:
-        click.echo(f"Unexpected error: {e}")
+        click.echo(f"Error: {e}")
         sys.exit(1)
-        
-# This ensures the CLI runs when executed directly
-if __name__ == "__main__":
-    calculate()
