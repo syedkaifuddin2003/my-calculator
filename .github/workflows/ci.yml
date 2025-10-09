@@ -133,7 +133,6 @@ jobs:
         run: black src/ tests/ --check
 
       - name: Show black diff
-        # show what would change (doesn't modify repo)
         run: black src/ tests/ --diff || true
 
   # Security stage: run bandit and upload JSON report
