@@ -16,7 +16,6 @@ try:
     from .calculator import add, subtract, multiply, divide, power, square_root
 except ImportError:
     from calculator import add, subtract, multiply, divide, power, square_root
-
 @click.command()
 @click.argument("operation")
 @click.argument("num1", type=float)
@@ -29,6 +28,7 @@ def calculate(operation, num1, num2=None):
             click.echo(f"Error: operation '{operation}' requires two numeric arguments")
             sys.exit(1)
 
+        # Compute result
         if operation == "add":
             result = add(num1, num2)
         elif operation == "subtract":
@@ -45,16 +45,12 @@ def calculate(operation, num1, num2=None):
             click.echo(f"Unknown operation: {operation}")
             sys.exit(1)
 
-        # Format output
-        if isinstance(result, float) and result.is_integer():
-            click.echo(int(result))
-        elif isinstance(result, float):
-            click.echo(f"{result:.2f}")
-        else:
-            click.echo(str(result))
+        # Print result
+        click.echo(result)
+        sys.exit(0)
 
     except ZeroDivisionError:
-        click.echo("Error: Division by zero")
+        click.echo("Cannot divide by zero")
         sys.exit(1)
     except Exception as e:
         click.echo(f"Unexpected error: {e}")
