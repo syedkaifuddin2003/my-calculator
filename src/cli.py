@@ -25,6 +25,14 @@ except ImportError:
 def calculate(operation, num1, num2=None):
     """Simple calculator CLI"""
     try:
+        # Validate arity for 2-arg operations
+        if (
+            operation in ("add", "subtract", "multiply", "divide", "power")
+            and num2 is None
+        ):
+            click.echo(f"Error: operation '{operation}' requires two numeric arguments")
+            sys.exit(1)
+
         if operation == "add":
             result = add(num1, num2)
         elif operation == "subtract":
@@ -35,10 +43,30 @@ def calculate(operation, num1, num2=None):
             result = divide(num1, num2)
         elif operation == "power":
             result = power(num1, num2)
-        elif operation == "square_root" or operation == "sqrt":
+        elif operation in ("square_root", "sqrt"):
             result = square_root(num1)
         else:
-            raise ValueError("Invalid operation selected.")
-        return result
+            click.echo(f"Unknown operation: {operation}")
+            sys.exit(1)
+
+        # Format output
+        if isinstance(result, float) and result.is_integer():
+            click.echo(int(result))
+        elif isinstance(result, float):
+            click.echo(f"{result:.2f}")
+        else:
+            click.echo(str(result))
+
+    except ValueError as e:
+        click.echo(f"Error: {e}")
+        sys.exit(1)
+    except ZeroDivisionError:
+        click.echo("Error: Division by zero")
+        sys.exit(1)
     except Exception as e:
-        print(f"Error: {e}")
+        click.echo(f"Unexpected error: {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    calculate()
