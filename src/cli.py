@@ -6,6 +6,7 @@ try:
 except ImportError:
     from calculator import add, subtract, multiply, divide, power, square_root
 
+
 @click.command()
 @click.argument("operation")
 @click.argument("num1", type=float)
@@ -35,6 +36,7 @@ def cli(operation, num1, num2=None):
     except Exception as e:
         click.echo(str(e))
         sys.exit(1)
+
 
 # This line is required for `python -m src.cli ...` to work!
 cli = cli
