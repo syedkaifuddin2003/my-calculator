@@ -28,10 +28,11 @@ def calculate(operation, num1, num2=None):
         else:
             click.echo(f"Unknown operation: {operation}")
             sys.exit(1)
-        click.echo(str(result))
+        # Print as integer if possible, else as float
+        if isinstance(result, float) and result.is_integer():
+            click.echo(str(int(result)))
+        else:
+            click.echo(str(result))
     except Exception as e:
         click.echo(str(e))
         sys.exit(1)
-
-if __name__ == "__main__":
-    calculate()
