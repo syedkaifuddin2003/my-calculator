@@ -55,3 +55,7 @@ def calculate(operation, num1, num2=None):
     except Exception as e:
         click.echo(f"Unexpected error: {e}")
         sys.exit(1)
+        
+# This ensures the CLI runs when executed directly
+if __name__ == "__main__":
+    calculate()
