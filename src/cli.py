@@ -25,6 +25,7 @@ except ImportError:
 def calculate(operation, num1, num2=None):
     """Simple calculator CLI"""
     try:
+<<<<<<< HEAD
         # Validate arity for 2-arg operations
         if (
             operation in ("add", "subtract", "multiply", "divide", "power")
@@ -33,6 +34,8 @@ def calculate(operation, num1, num2=None):
             click.echo(f"Error: operation '{operation}' requires two numeric arguments")
             sys.exit(1)
 
+=======
+>>>>>>> 68385e3 (- Added the power and square-root)
         if operation == "add":
             result = add(num1, num2)
         elif operation == "subtract":
@@ -43,6 +46,7 @@ def calculate(operation, num1, num2=None):
             result = divide(num1, num2)
         elif operation == "power":
             result = power(num1, num2)
+<<<<<<< HEAD
         elif operation == "sqrt":
             result = square_root(num1)
         else:
@@ -70,3 +74,12 @@ def calculate(operation, num1, num2=None):
 
 if __name__ == "__main__":
     calculate()
+=======
+        elif operation == "square_root" or operation == "sqrt":
+            result = square_root(num1)
+        else:
+            raise ValueError("Invalid operation selected.")
+        return result
+    except Exception as e:
+        print(f"Error: {e}")
+>>>>>>> 68385e3 (- Added the power and square-root)
