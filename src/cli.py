@@ -2,14 +2,20 @@
 Command Line Interface for Calculator
 Example usage:
     python -m src.cli add 5 3
-    python -m src.cli divide 5 3
-    python -m src.cli sqrt 9
+    python src/cli.py add 5 3   # also supported thanks to fallback import
 """
 
 import sys
 import click
-# 👇 Use relative import so pylint & pytest can resolve it correctly
-from .calculator import add, subtract, multiply, divide, power, square_root
+
+# Try relative import (works when run as package: python -m src.cli).
+# If that fails (running the file directly: python src/cli.py), fall back
+# to an absolute import which will work because the script's directory is
+# added to sys.path when executed directly.
+try:
+    from .calculator import add, subtract, multiply, divide, power, square_root
+except ImportError:
+    from calculator import add, subtract, multiply, divide, power, square_root
 
 
 @click.command()
@@ -19,7 +25,11 @@ from .calculator import add, subtract, multiply, divide, power, square_root
 def calculate(operation, num1, num2=None):
     """Simple calculator CLI"""
     try:
-        # Perform the selected operation
+        # Validate arity for 2-arg operations
+        if operation in ("add", "subtract", "multiply", "divide", "power") and num2 is None:
+            click.echo(f"Error: operation '{operation}' requires two numeric arguments")
+            sys.exit(1)
+
         if operation == "add":
             result = add(num1, num2)
         elif operation == "subtract":
@@ -36,9 +46,7 @@ def calculate(operation, num1, num2=None):
             click.echo(f"Unknown operation: {operation}")
             sys.exit(1)
 
-        # Format output:
-        #   - integers → no decimals
-        #   - floats → 2 decimal places (for divide etc.)
+        # Format output
         if isinstance(result, float) and result.is_integer():
             click.echo(int(result))
         elif isinstance(result, float):
