@@ -10,7 +10,7 @@ except ImportError:
 @click.argument("operation")
 @click.argument("num1", type=float)
 @click.argument("num2", type=float, required=False)
-def calculate(operation, num1, num2=None):
+def cli(operation, num1, num2=None):
     """Simple calculator CLI"""
     try:
         if operation == "add":
@@ -28,10 +28,7 @@ def calculate(operation, num1, num2=None):
         else:
             click.echo(f"Unknown operation: {operation}")
             sys.exit(1)
-        # DEBUG print
-        print(f"DEBUG: type={type(result)}, value={repr(result)}", file=sys.stderr)
-        # Print as integer if possible, else as float
-        if isinstance(result, (int, float)) and float(result).is_integer():
+        if isinstance(result, (float, int)) and float(result).is_integer():
             click.echo(str(int(result)))
         else:
             click.echo(str(result))
@@ -39,3 +36,8 @@ def calculate(operation, num1, num2=None):
         click.echo(str(e))
         sys.exit(1)
 
+# This line is required for `python -m src.cli ...` to work!
+cli = cli
+
+if __name__ == "__main__":
+    cli()
