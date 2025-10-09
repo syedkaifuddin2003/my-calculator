@@ -9,12 +9,13 @@ import pytest
 
 class TestCLIIntegration:
     """Test CLI application integrating with calculator module"""
+def run_cli(self, *args):
+    """Helper method to run CLI and capture output"""
+    # Run the CLI as a module so relative imports work
+    cmd = [sys.executable, "-m", "src.cli"] + list(args)
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=".")
+    return result
 
-    def run_cli(self, *args):
-        """Helper method to run CLI and capture output"""
-        cmd = [sys.executable, "src/cli.py"] + list(args)
-        result = subprocess.run(cmd, capture_output=True, text=True, cwd=".")
-        return result
 
     def test_cli_add_integration(self):
         """Test CLI can perform addition"""
