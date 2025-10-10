@@ -1,36 +1,24 @@
-name: CI/CD pipeline
+name: CI Pipeline
 
 on:
   push:
-
     branches: ["**"]
   pull_request:
     branches: ["**"]
-
-    branches: [ '**' ]
-  pull_request:
-    branches: [ '**' ]
-
 
 jobs:
-  # Build stage: prepare Python and install dependencies
+  # ==========================
+  # 1️⃣ Build Stage
+  # ==========================
   build:
     runs-on: ubuntu-latest
-    outputs:
-      python-version: "3.13"
+
     steps:
       - name: Checkout repository
-
-        uses: actions/checkout@v3
-
-      - name: Set up Python 3.13
-
         uses: actions/checkout@v4
 
-      - name: Set up Python
-
+      - name: Set up Python 3.13
         uses: actions/setup-python@v4
-        id: set-python
         with:
           python-version: "3.13"
 
@@ -42,91 +30,71 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           echo "✅ Dependencies installed successfully"
 
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-  # Test stage: run unit/integration tests
-
+  # ==========================
+  # 2️⃣ Test Stage
+  # ==========================
   test:
     runs-on: ubuntu-latest
     needs: build
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
       - name: Set up Python 3.13
-
-      - name: Set up Python
-
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
 
-
-      - name: Install Dependencies
-
       - name: Install dependencies
-
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-
-      - name: Unit Tests with Coverage
+      - name: Run Unit Tests with Coverage
         run: |
           echo "🧪 Running unit tests..."
           pytest tests/unit/ -v --cov=src --cov-report=term --cov-report=xml
 
-      - name: Integration Tests
+      - name: Run Integration Tests
         run: |
           echo "🔗 Running integration tests..."
           pytest tests/integration/ -v --tb=short
 
-      - name: Run tests (verbose)
+      - name: Run all tests (verbose)
         run: pytest tests/ -v
 
-  # Coverage stage: run coverage and upload HTML report
-
+  # ==========================
+  # 3️⃣ Coverage Stage
+  # ==========================
   coverage:
     runs-on: ubuntu-latest
     needs: test
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.13
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
 
-
-      - name: Install Dependencies
-
       - name: Install dependencies
-
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run tests with coverage and generate HTML report
-
         run: |
           echo "🧮 Checking test coverage..."
           pytest tests/ --cov=src --cov-fail-under=80 --cov-report=term-missing --cov-report=html
-
-        run: pytest tests/ --cov=src --cov-report=html
-
 
       - name: Upload coverage HTML
         uses: actions/upload-artifact@v4
@@ -134,18 +102,18 @@ jobs:
           name: coverage-html
           path: htmlcov
 
-
-
-  # Code quality (lint) stage
-
+  # ==========================
+  # 4️⃣ Lint Stage
+  # ==========================
   lint:
     runs-on: ubuntu-latest
     needs: coverage
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.13
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
@@ -157,7 +125,6 @@ jobs:
 
       - name: Run pylint and save report
         run: |
-
           echo "🔎 Running pylint..."
           pylint src/ --output-format=text > lint_report.txt || true
           echo "Saved lint report to lint_report.txt"
@@ -170,31 +137,24 @@ jobs:
           fi
           awk -v s="$score" 'BEGIN{ if (s+0 < 7.0) exit 1 }' || (echo "Pylint score $score is below threshold 7.0" && exit 1)
 
-          pylint src/ --output-format=text > lint_report.txt || true
-
-
       - name: Upload lint report
         uses: actions/upload-artifact@v4
         with:
           name: lint-report
           path: lint_report.txt
 
-
-
-  # Formatting stage
-
+  # ==========================
+  # 5️⃣ Format Stage
+  # ==========================
   format:
     runs-on: ubuntu-latest
     needs: lint
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
       - name: Set up Python 3.13
-
-      - name: Set up Python
-
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
@@ -204,8 +164,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install black
 
-
-      - name: Check formatting with black (apply if fails)
+      - name: Check formatting with black (auto-fix if fails)
         run: |
           echo "🖤 Checking formatting with black..."
           if ! black src/ tests/ --check; then
@@ -214,32 +173,22 @@ jobs:
           else
             echo "Black formatting OK"
           fi
-          
-      - name: Show black diff (if any)
-        run: black src/ tests/ --diff || true
-
-
-      - name: Check formatting with black (check)
-        run: black src/ tests/ --check
 
       - name: Show black diff
-        # show what would change (doesn't modify repo)
         run: black src/ tests/ --diff || true
 
-  # Security stage: run bandit and upload JSON report
-
+  # ==========================
+  # 6️⃣ Security Stage
+  # ==========================
   security:
     runs-on: ubuntu-latest
     needs: format
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
       - name: Set up Python 3.13
-
-      - name: Set up Python
-
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
@@ -249,22 +198,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install bandit
 
-      - name: Run bandit (console)
-
+      - name: Run bandit scan (text + JSON report)
         run: |
           echo "🔐 Running bandit security scan..."
           bandit -r src/ -v || true
-
-      - name: Run bandit (json output)
-        run: |
-          rm -f security_report.json || true
           bandit -r src/ -f json -o security_report.json || true
-
-        run: bandit -r src/ -v || true
-
-      - name: Run bandit (json output)
-        run: bandit -r src/ -f json -o security_report.json || true
-
 
       - name: Upload security report
         uses: actions/upload-artifact@v4
@@ -272,10 +210,13 @@ jobs:
           name: security-report
           path: security_report.json
 
-
+  # ==========================
+  # 7️⃣ Deploy Stage
+  # ==========================
   deploy:
     runs-on: ubuntu-latest
     needs: security
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -301,9 +242,9 @@ jobs:
           path: artifacts/security
         continue-on-error: true
 
-      - name: "Simple package: compile, zip and upload"
+      - name: Package and Upload Deployment ZIP
         run: |
-          echo "📦 Creating simple deployment package..."
+          echo "📦 Creating deployment package..."
           rm -f deployment-package.zip || true
           python -m compileall -b -f src || true
           zip -r deployment-package.zip src artifacts README.md requirements.txt || true
@@ -316,4 +257,3 @@ jobs:
         with:
           name: deployment-zip
           path: deployment-package.zip
-
