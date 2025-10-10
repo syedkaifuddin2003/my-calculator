@@ -150,7 +150,8 @@ jobs:
             black src/ tests/
           else
             echo "Black formatting OK"
-
+          fi
+          
       - name: Show black diff (if any)
         run: black src/ tests/ --diff || true
 
